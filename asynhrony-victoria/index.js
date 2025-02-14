@@ -22,16 +22,29 @@
 const weatherUrl =
   "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m";
 
+let isCelsius = true;
+
+const temperatureBtn = document.querySelector('#temperatureBtn');
+temperatureBtn.textContent = `Switch to ${isCelsius ? `F`: `C`}`;
+
+temperatureBtn.addEventListener('click',switchTemperature)
+function switchTemperature(){
+  //поміняти значення пропорця на протилежний
+  isCelsius = !isCelsius;
+  //поміняти напис на кнопці
+  temperatureBtn.textContent = `Switch to ${isCelsius ? `F`: `C`}`;
+  //завантажити данні з температурою в Фаренге́йта 
+  fetch(`https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m${isCelsius? '':'&temperature_2m&temperature_unit=fahrenheit'}`)
+  .then((response) => response.json())
+  .then((data) => generateWeather(data))
+  .catch((err) => console.log("error:", err));
+}
+
 fetch(weatherUrl)
   .then((response) => response.json())
   .then((data) => generateWeather(data))
   .catch((err) => console.log("error:", err));
 
-//відобразити на сторінці поточну температуру з одиницєю виміру
-//відобразити мінусову температуру синім кольором
-// 0 - чорним
-//плюсову температуру до 40 - зеленим
-//температура >= 40 - червоним
 
 function generateWeather(data) {
   //data.current.temperature_2m = 70 - для тестування температури
@@ -45,6 +58,7 @@ function generateWeather(data) {
 
   document.body.append(currentTemperatureEl);
   document.body.append(currentWindSpeed)
+  document.body.append(temperatureBtn)
 }
 
 function calcTemperatureColor(temperature) {
