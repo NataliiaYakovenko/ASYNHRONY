@@ -1,79 +1,18 @@
 "use strict";
 
-//відобразити на сторінці поточну температуру з одиницєю виміру
-//відобразити мінусову температуру синім кольором
-// 0 - чорним
-//плюсову температуру до 40 - зеленим
-//температура >= 40 - червоним
+// status pending  - очикування
 
-/*
-Алгоритм
+// statuse fulfilled (виконано) => then
+// statuse reject (відхилено) => catch
 
-Обовєязкові
-1. Створити елемент
-Необхідні
-2. Задати значення атрибута
-3. Якщо необхідно.Додати класи
-4. Додати контент
-5. Додати обробник на якусь подію
-Обовєязкові
-6. Вбудуваи його туди куди потрібно
-*/
-
-
-let isCelsius = true;
-
-const temperatureBtn = document.querySelector("#temperatureBtn");
-
-temperatureBtn.addEventListener("click", switchTemperature);
-
-function switchTemperature() {
-  isCelsius = !isCelsius;
-  render()
+function promiseCallback(resolve,reject){
+ //виконуються кісь дії
+ //resolve('success result')
+ reject(new Error('something wrong'))
 }
 
-render();
-function render() {
-  temperatureBtn.textContent = `Switch to ${isCelsius ? `F` : `C`}`;
+const promise = new Promise(promiseCallback)
 
-  const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m${
-    isCelsius ? "" : "&temperature_2m&temperature_unit=fahrenheit"
-  }`;
-  // "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m";
-
-  fetch(weatherUrl)
-    .then((response) => response.json())
-    .then((data) => generateWeather(data))
-    .catch((err) => console.log("error:", err));
-}
-
-function generateWeather(data) {
-  //data.current.temperature_2m = 70 - для тестування температури
-
-  const currentTemperatureEl = document.querySelector(".temp");
-  currentTemperatureEl.classList.add("weather");
-  currentTemperatureEl.textContent = `${data.current.temperature_2m} ${data.hourly_units.temperature_2m}`;
-  currentTemperatureEl.style.color = calcTemperatureColor(
-    data.current.temperature_2m
-  );
-
-  const currentWindSpeed = document.querySelector(".wind");
-  currentWindSpeed.classList.add("weather");
-  currentWindSpeed.textContent = `${data.current.wind_speed_10m} ${data.hourly_units.wind_speed_10m}`;
-
-  document.body.append(currentTemperatureEl);
-  document.body.append(currentWindSpeed);
-  document.body.append(temperatureBtn);
-}
-
-function calcTemperatureColor(temperature) {
-  if (temperature < 0) {
-    return "blue";
-  } else if (temperature === 0) {
-    return "black";
-  } else if (temperature > 0 && temperature < 40) {
-    return "green";
-  } else {
-    return "red";
-  }
-}
+promise
+.then(data=>console.log(data))
+.catch(error=>console.log(error))
